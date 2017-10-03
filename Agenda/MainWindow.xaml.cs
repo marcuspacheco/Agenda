@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using MessageBox = System.Windows.MessageBox;
 
 namespace Agenda
 {
@@ -35,16 +34,17 @@ namespace Agenda
                 {
                     // Inserir
                     contato = new Contato(txtNome.Text, txtEmpresa.Text, txtCargo.Text, txtEmail.Text,
-                       dtpData.DisplayDate, txtSite.Text, (int)cboParentesco.SelectedValue);
+                       dtpData.DisplayDate, txtSite.Text, txtResidencial.Text, txtCelular.Text, (int)cboParentesco.SelectedValue);
                 }
                 else
                 {
                     // Alterar
                     contato = new Contato(int.Parse(txtCodigo.Text), txtNome.Text, txtEmpresa.Text, txtCargo.Text, txtEmail.Text,
-                       dtpData.SelectedDate.Value.Date, txtSite.Text, int.Parse(cboParentesco.SelectedValue.ToString()));
+                       dtpData.SelectedDate.Value.Date, txtSite.Text, txtResidencial.Text, txtCelular.Text, int.Parse(cboParentesco.SelectedValue.ToString()));
                 }
 
                 Salvar(contato);
+                Dispatcher.BeginInvoke((Action)(() => tabControl1.SelectedIndex = 0));
             }
         }
 
@@ -63,13 +63,15 @@ namespace Agenda
                 new KeyValuePair<string, object>("@Cargo", contato.Cargo),
                 new KeyValuePair<string, object>("@Email", contato.Email),
                 new KeyValuePair<string, object>("@Website", contato.Website),
+                new KeyValuePair<string, object>("@Residencial", contato.Residencial),
+                new KeyValuePair<string, object>("@Celular", contato.Celular),
                 new KeyValuePair<string, object>("@ParentescoID", contato.ParentescoId),
                 new KeyValuePair<string, object>("@DataNascimento", FormatarDataSQL(contato.DataNascimento.ToString()))
             };
             if (contato.ContatoId == 0)
             {
                 var comandoSql =
-                    "INSERT INTO Contato (Nome, Empresa, Cargo, Email, DataNascimento, Website, ParentescoID) VALUES (@Nome, @Empresa, @Cargo, @Email, @DataNascimento, @Website, @ParentescoID)";
+                    "INSERT INTO Contato (Nome, Empresa, Cargo, Email, DataNascimento, Website, Residencial, Celular, ParentescoID) VALUES (@Nome, @Empresa, @Cargo, @Email, @DataNascimento, @Website, @Residencial, @Celular, @ParentescoID)";
                 var codigo = 0;
                 if (acessoBd.Inserir(comandoSql, parametros, ref codigo))
                 {
@@ -82,7 +84,7 @@ namespace Agenda
             else
             {
                 var comandoSql =
-                    "UPDATE Contato SET Nome = @Nome, Empresa = @Empresa, Cargo = @Cargo, Email = @Email, DataNascimento = @DataNascimento, Website = @Website, ParentescoID = @ParentescoID WHERE ContatoID = @ContatoID";
+                    "UPDATE Contato SET Nome = @Nome, Empresa = @Empresa, Cargo = @Cargo, Email = @Email, DataNascimento = @DataNascimento, Website = @Website, Residencial = @Residencial, Celular = @Celular, ParentescoID = @ParentescoID WHERE ContatoID = @ContatoID";
                 parametros.Add(new KeyValuePair<string, object>("@ContatoID", contato.ContatoId));
                 if (acessoBd.AtualizarApagar(comandoSql, parametros))
                 {
@@ -100,6 +102,8 @@ namespace Agenda
             txtEmpresa.Text = string.Empty;
             txtCargo.Text = string.Empty;
             txtEmail.Text = string.Empty;
+            txtResidencial.Text = string.Empty;
+            txtCelular.Text = string.Empty;
             dtpData.SelectedDate = DateTime.Now.Date;
             txtSite.Text = string.Empty;
             cboParentesco.SelectedIndex = -1;
@@ -122,11 +126,11 @@ namespace Agenda
             {
                 var acessoBd = new AcessoDb();
                 var dtContato = acessoBd.Buscar(
-                    "SELECT ContatoID, A.Nome, Empresa, Cargo, Email, CONVERT(NVARCHAR(50), A.DataNascimento, 103) AS DataNascimento, Website, A.ParentescoID, B.Nome AS Parentesco FROM Contato A LEFT JOIN Parentesco B ON A.ParentescoID = B.ParentescoID ORDER BY Nome",
+                    "SELECT ContatoID, A.Nome, Empresa, Cargo, Email, CONVERT(NVARCHAR(50), A.DataNascimento, 103) AS DataNascimento, Website, Residencial, Celular, A.ParentescoID, B.Nome AS Parentesco FROM Contato A LEFT JOIN Parentesco B ON A.ParentescoID = B.ParentescoID ORDER BY Nome",
                     new List<KeyValuePair<string, object>>());
 
                 DataGrid.ItemsSource = dtContato.DefaultView;
-                Dispatcher.BeginInvoke((Action)(() => DataGrid.Columns[7].Visibility = Visibility.Hidden));
+                Dispatcher.BeginInvoke((Action)(() => DataGrid.Columns[9].Visibility = Visibility.Hidden));
             }
         }
 
@@ -146,7 +150,7 @@ namespace Agenda
         {
             var acessoBd = new AcessoDb();
             var dtContato = acessoBd.Buscar(
-                $"SELECT ContatoID, A.Nome, Empresa, Cargo, Email, CONVERT(NVARCHAR(50), A.DataNascimento, 103) AS DataNascimento, Website, A.ParentescoID, B.Nome AS Parentesco FROM Contato A LEFT JOIN Parentesco B ON A.ParentescoID = B.ParentescoID WHERE ContatoID = {codigo} ORDER BY Nome",
+                $"SELECT ContatoID, A.Nome, Empresa, Cargo, Email, CONVERT(NVARCHAR(50), A.DataNascimento, 103) AS DataNascimento, Website, Residencial, Celular, A.ParentescoID, B.Nome AS Parentesco FROM Contato A LEFT JOIN Parentesco B ON A.ParentescoID = B.ParentescoID WHERE ContatoID = {codigo} ORDER BY Nome",
                 new List<KeyValuePair<string, object>>());
 
             if (dtContato.DefaultView.Count > 0)
@@ -156,11 +160,50 @@ namespace Agenda
                 txtEmpresa.Text = dtContato.DefaultView[0]["Empresa"].ToString();
                 txtCargo.Text = dtContato.DefaultView[0]["Cargo"].ToString();
                 txtEmail.Text = dtContato.DefaultView[0]["Email"].ToString();
+                txtResidencial.Text = dtContato.DefaultView[0]["Residencial"].ToString();
+                txtCelular.Text = dtContato.DefaultView[0]["Celular"].ToString();
                 dtpData.Text = dtContato.DefaultView[0]["DataNascimento"].ToString();
                 txtSite.Text = dtContato.DefaultView[0]["Website"].ToString();
                 cboParentesco.SelectedValue = dtContato.DefaultView[0]["ParentescoId"].ToString();
                 Dispatcher.BeginInvoke((Action)(() => tabControl1.SelectedIndex = 1));
             }
+        }
+
+        private void DataGrid_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.RightButton == System.Windows.Input.MouseButtonState.Pressed)
+            {
+                if (DataGrid.SelectedCells.Count > 0)
+                {
+                    DataGridCellInfo cellInfo = DataGrid.SelectedCells[0];
+                    DataGridBoundColumn column = cellInfo.Column as DataGridBoundColumn;
+                    FrameworkElement element = new FrameworkElement() { DataContext = cellInfo.Item };
+                    BindingOperations.SetBinding(element, TagProperty, column.Binding);
+
+                    var result = MessageBox.Show($"Deseja remover o contato {element.Tag.ToString()}?", "Pergunta", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        RemoverContato(element.Tag.ToString());
+                    }
+                }
+            }
+        }
+
+        private void RemoverContato(string codigo)
+        {
+            var acessoBd = new AcessoDb();
+            var parametros = new List<KeyValuePair<string, object>>();
+            parametros.Add(new KeyValuePair<string, object>("@ContatoID", codigo));
+            acessoBd.Buscar(
+                $"DELETE FROM Contato WHERE ContatoID = @ContatoID", parametros);
+            MessageBox.Show("Contato removido com sucesso!", "Informação", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            var dtContato = acessoBd.Buscar(
+                "SELECT ContatoID, A.Nome, Empresa, Cargo, Email, CONVERT(NVARCHAR(50), A.DataNascimento, 103) AS DataNascimento, Website, Residencial, Celular, A.ParentescoID, B.Nome AS Parentesco FROM Contato A LEFT JOIN Parentesco B ON A.ParentescoID = B.ParentescoID ORDER BY Nome",
+                new List<KeyValuePair<string, object>>());
+
+            DataGrid.ItemsSource = dtContato.DefaultView;
+            Dispatcher.BeginInvoke((Action)(() => DataGrid.Columns[9].Visibility = Visibility.Hidden));
         }
     }
 }

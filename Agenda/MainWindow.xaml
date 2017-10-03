@@ -9,7 +9,7 @@
         <TabControl x:Name="tabControl1" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="549" Width="772" SelectionChanged="TabControl_SelectionChanged">
             <TabItem x:Name="tbLista" Header="Contatos">
                 <Grid Background="#FFE5E5E5" >
-                    <DataGrid IsReadOnly="True" Name="DataGrid" HorizontalAlignment="Left" Height="235" Margin="10,10,0,0" VerticalAlignment="Top" Width="746" MouseDoubleClick="DataGrid_MouseDoubleClick"/>
+                    <DataGrid IsReadOnly="True" Name="DataGrid" HorizontalAlignment="Left" Height="235" Margin="10,10,0,0" VerticalAlignment="Top" Width="746" MouseDoubleClick="DataGrid_MouseDoubleClick" MouseDown="DataGrid_MouseDown"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="tpEditar" Header="Editar">
@@ -26,12 +26,16 @@
                     <Label Content="E-mail:" HorizontalAlignment="Left" Margin="10,132,0,0" VerticalAlignment="Top"/>
                     <TextBox x:Name="txtSite" HorizontalAlignment="Left" Height="23" Margin="112,163,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="435"/>
                     <Label Content="Site:" HorizontalAlignment="Left" Margin="10,163,0,0" VerticalAlignment="Top"/>
-                    <ComboBox Name="cboParentesco" HorizontalAlignment="Left" Margin="112,198,0,0" VerticalAlignment="Top" Width="435"
+                    <ComboBox Name="cboParentesco" HorizontalAlignment="Left" Margin="112,250,0,0" VerticalAlignment="Top" Width="435"
                               DisplayMemberPath="Nome" SelectedValuePath="ParentescoID" />
-                    <Label Content="Parentesco:" HorizontalAlignment="Left" Margin="10,194,0,0" VerticalAlignment="Top"/>
+                    <Label Content="Parentesco:" HorizontalAlignment="Left" Margin="10,246,0,0" VerticalAlignment="Top"/>
                     <Button Name="btnGravar" Content="Gravar" HorizontalAlignment="Left" Margin="472,316,0,0" VerticalAlignment="Top" Width="75" Click="btnGravar_Click"/>
-                    <DatePicker Name="dtpData" HorizontalAlignment="Left" Margin="112,232,0,0" VerticalAlignment="Top" Width="190"/>
-                    <Label Content="Dt. Nascimento:" HorizontalAlignment="Left" Margin="10,232,0,0" VerticalAlignment="Top"/>
+                    <DatePicker Name="dtpData" HorizontalAlignment="Left" Margin="112,280,0,0" VerticalAlignment="Top" Width="190"/>
+                    <Label Content="Dt. Nascimento:" HorizontalAlignment="Left" Margin="10,280,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="txtResidencial" HorizontalAlignment="Left" Height="23" Margin="112,193,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="435"/>
+                    <Label Content="Tel. Residencial:" HorizontalAlignment="Left" Margin="10,193,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="txtCelular" HorizontalAlignment="Left" Height="23" Margin="112,221,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="435"/>
+                    <Label Content="Tel. Celular:" HorizontalAlignment="Left" Margin="10,221,0,0" VerticalAlignment="Top"/>
                 </Grid>
             </TabItem>
         </TabControl>
